@@ -1,0 +1,16 @@
+<html><body><h1>GCP Cloud Run Deployment Guide</h1>
+<h2>Prerequisites</h2><ul><li>GCP Project</li><li>Artifact Registry</li><li>gcloud CLI</li></ul>
+<h2>Build Docker Image</h2><pre>docker build -t taskflow-agent .</pre>
+<h2>Artifact Registry</h2><pre>
+gcloud auth login
+gcloud config set project PROJECT_ID
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
+gcloud artifacts repositories create taskflow-repo --repository-format=docker --location=us-central1
+gcloud auth configure-docker us-central1-docker.pkg.dev
+docker tag taskflow-agent us-central1-docker.pkg.dev/PROJECT_ID/taskflow-repo/taskflow-agent:latest
+docker push us-central1-docker.pkg.dev/PROJECT_ID/taskflow-repo/taskflow-agent:latest
+</pre>
+<h2>Deploy Cloud Run</h2><pre>
+gcloud run deploy taskflow-agent --image us-central1-docker.pkg.dev/PROJECT_ID/taskflow-repo/taskflow-agent:latest --platform managed --region us-central1 --allow-unauthenticated --port 8080
+</pre>
+<p>Set environment variables in Cloud Run.</p></body></html>
